@@ -1,65 +1,145 @@
-const input = document.getElementById('inputScreen'),
-    numbers = document.querySelectorAll('.number'),
-    operators = document.querySelectorAll('.operator');
-    output = document.getElementById('outputScreen');
- 
+class Calculator {
+    constructor(previousOperandTextElement, currentOperandTextElement){
+        this.previousOperandTextElement = previousOperandTextElement;
+        this.currentOperandTextElement = currentOperandTextElement;
+        this.clear();
+    
+    }
+    clear(){
+        this.currentOperand = '';
+        this.previousOperand = '';
+        this. operation = undefined;
 
-numbers.forEach(number=>{
-    number.addEventListener('click', (e)=>{
-        input.value+=e.target.innerText;
-        const value = input.value;
-        Array.from(value).forEach(char=>{
-            console.log('char ', char);
-            if (char==='+' || char ==='-' || char === '*' || char === '/' || char === 'm'){
-                const operatorIndex = value.indexOf(char);
-                const number1 =  +value.slice(0,operatorIndex);
-                const number2 = +value.slice(operatorIndex + 1);
-                const operator = char;
-                output.value = compute(number1, number2, operator);
-                return
-                
-            }
-        })
-    })
-})
+    }
 
-operators.forEach(operator=>{
-    operator.addEventListener('click', (e)=>{
-        if(output.value) input.value = output.value;
+    delete(){
+        this.currentOperand = this.currentOperand.toString().slice(0,-1);
 
+    }
 
-        lastChar = input.value.slice(-1);
-        
-        if(lastChar===e.target.innerText) return;
-        if(isNaN(+lastChar)) {
-            
-            input.value=input.value.replace(lastChar, operator.innerText);
-            return;
+    appendNumber(number){
+        if (number === '.' && this.currentOperand.includes('.')) return;
+        this.currentOperand = this.currentOperand.toString() + number.toString();
+
+    }
+
+    chooseOperation(operation){
+        if(this.currentOperand === '') return;
+        if(this.previousOperand !== ''){
+            this.compute();
         }
-   
-        input.value+=e.target.innerText;
+        this.operation = operation;
+        this.previousOperand = this.currentOperand;
+        this.currentOperand = '';
+
+    }
+
+    compute(){
+        let computation;
+        const prev = parseFloat(this.previousOperand);
+        const current = parseFloat(this.currentOperand);
+        if(isNaN(prev) || isNaN(current)) return;
+        switch (this.operation){
+            case '+': 
+            computation = prev + current;
+            break;
+            case '-':
+                computation = prev - current;
+                break;
+            case'*':
+                computation = prev * current;
+                break;
+            case '/':
+                computation = prev / current;
+                break;
+            default:
+                return;
+
+         }
+          this.currentOperand = computation;
+          this.operation = undefined;
+          this.previousOperand = '';
 
 
 
-    });
-})
 
+    }
+//helper function to dislay values with commas;
+    getDisplayNumber(number){
+        const stringNumber = number.toString();
+        const integerDigits = parseFloat(stringNumber.split('.')[0])
+        const decimalDigits = stringNumber.split('.')[1];
+        let integerDisplay;
 
-const compute = function(number1, number2, operator){
-    if(number1===undefined || number2===undefined || operator===undefined) return;
-    switch (operator) {
+        if(isNaN(integerDigits)){
+            integerDisplay = ''
 
-        case '+':
-            return number1 + number2;
-        case '-':
-            return number1 - number2;
-        case '*':
-            return number1 * number2;
-        case '/':
-            return number1 / number2;
-        case 'm':
-            return number1 % number2;
-        default:
-            return
+        } else {
+            integerDisplay = integerDigits.toLocaleString('en', {
+                maximumFractionDigits: 0;
+            })
+            if(decimalDigits !=null){
+                return `${integerDisplay} ${decimalDigits}`;
+            } else {
+                return integerDisplay;
+            }
+        }
+
+        // const floatNumber = parseFloat(number);
+        // // if(isNaN(floatNumber)) return '';
+
+        // // return floatNumber.toLocalString('en');
+    }
+
+    updateDisplay(){
+        this.currentOperandTextElement.innerText = this.currentOperand;
+        this.getDisplayNumber(this.currentOperand);
+        if(this.operation != null){
+            
+            this.previousOperandTextElement.innerText = 
+            `${this.getDisplayNumber(this.previousOperand)} ${this.getDisplayNumber(this.operation)}`;
+        } else {
+            this.previousOperandTextElement.innerText = '';
+        }
+
     }
 }
+
+const numberButtons = document.querySelectorAll('.number');
+const operationButtons = document.querySelectorAll('.operation');
+const equalsButton = document.querySelector('[data-equals]');
+const deleteButton = document.querySelector('[data-delete]');
+const allClearButton = document.querySelector('[data-all-clear]');
+const previousOperandTextElement = document.querySelector('[data-previous-operand]');
+const currentOperandTextElement = document.querySelector('[data-current-operand]');
+
+const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
+
+
+numberButtons.forEach( button =>{
+    button.addEventListener('click', () =>{
+        calculator.appendNumber(button.innerText);
+
+        calculator.updateDisplay();
+        });
+})
+
+
+operationButtons.forEach(button => {
+    button.addEventListener('click', () =>{
+        calculator.chooseOperation (button.innerText);
+        calculator.updateDisplay();
+    });
+});
+
+
+equalsButton.addEventListener('click', (button) =>{
+    calculator.compute();
+    calculator.updateDisplay();
+});
+
+
+deleteButton.addEventListener('click', (button) =>{
+    calculator.delete ();
+    calculator.updateDisplay();
+});

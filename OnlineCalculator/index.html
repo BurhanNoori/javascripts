@@ -14,14 +14,14 @@
                 <tbody>
                     <th>
                         <tr>
-                            <td><input type="text" name="inputScreen" id="inputScreen" style="height:30px;border-bottom:none"></td>
+                            <td><input data-previous-operand type="text" name="inputScreen" id="inputScreen" style="height:30px;border-bottom:none"></td>
                             
                         </tr>
                         <tr>
-                            <td><input type="text" name="outputScreen" id="outputScreen" style="height:10px;border-top: none;"></td>
+                            <td><input data-current-operand type="text" name="outputScreen" id="outputScreen" style="height:10px;border-top: none;"></td>
                         </tr>
                         <tr>
-                            <td><button>BCKSP</button></td>
+                            <td><button data-delete class="backspace">BCKSP</button></td>
                             <td><button>(</button></td>
                             <td><button>)</button></td>
                             <td><button class="operator">m</button></td>
@@ -65,13 +65,13 @@
                             <td><button>sin</button></td>
                             <td><button>cos</button></td>
                             <td><button>tan</button></td>
-                            <td><button>=</button></td>
+                            <td><button data-equals>=</button></td>
                         </tr>
                         <tr>
                             <td><button>P</button></td>
                             <td><button>C</button></td>
                             <td><button>!</button></td>
-                            <td><button>1/x</button></td>
+                            <td><button data-all-clear>Clear</button></td>
                         </tr>
                     </th>
                 </tbody>
